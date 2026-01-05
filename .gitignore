@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+venv/
+.env
+
+# Project Specific
+aegis_model.pkl
+*.csv
+.DS_Store
+
+# Credentials
+secrets.json
