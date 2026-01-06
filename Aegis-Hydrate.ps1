@@ -2,7 +2,7 @@
 .SYNOPSIS
     Aegis-Hydrate: Exports Sysmon logs and current configuration for ML analysis.
 .DESCRIPTION
-    This script automates the collection of the last 1000 Sysmon events into a 
+    This script automates the collection of the last 10000 Sysmon events into a 
     valid XML format and dumps the active Sysmon configuration to a text file.
 #>
 
