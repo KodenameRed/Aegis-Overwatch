@@ -1,46 +1,59 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import joblib
+import os, time, json, joblib, requests
 import pandas as pd
-import os # Added for professional path handling
-from Aegis_Train import extract_features
-from colorama import Fore, Back, Style, init
+from colorama import Fore, init
 
 init(autoreset=True)
-app = FastAPI(title="Overwatch Security Gateway")
 
-print(f"{Fore.CYAN}[*] Loading Aegis-Brain...")
-model = joblib.load('aegis_model.pkl')
+# --- CONFIG ---
+HIVE_URL = os.getenv("HIVE_URL", "http://host.docker.internal:8000/analyze")
+API_KEY = "Burn_Greek_Fire_Burn1088"
+MODEL_PATH = "aegis_model.pkl" 
 
-class SysmonLog(BaseModel):
-    Image: str
-    CommandLine: str
-    ParentImage: str = ""
+# Load the local brain
+clf = joblib.load(MODEL_PATH) if os.path.exists(MODEL_PATH) else None
 
-@app.post("/analyze")
-def analyze_log(log: SysmonLog):
-    try:
-        data = pd.DataFrame([log.model_dump()])
-        features = extract_features(data)
+def run_sentinel_drill():
+    print(f"{Fore.CYAN}--- AEGIS SENTINEL: 30-SECOND DRILL ---")
+    print("[1/3] BASELINE: 15 seconds of idle...")
+    time.sleep(15)
+    
+    print(f"{Fore.YELLOW}[2/3] ATTACK WINDOW: 10 seconds. (GO!)")
+    drill_data = {
+        "duration": 10.0,
+        "orig_bytes": 45000, 
+        "resp_bytes": 500,
+        "orig_pkts": 300,
+        "resp_pkts": 50,
+        "conn_state": "SF"
+    }
+    time.sleep(10)
+    
+    print("[3/3] COOLDOWN: 5 seconds.")
+    time.sleep(5)
+    
+    # --- UPDATED DETECTION LOGIC ---
+    if clf:
+        # Align features exactly as the Hive does
+        feat = pd.DataFrame([drill_data])[["duration", "orig_bytes", "resp_bytes", "orig_pkts", "resp_pkts"]]
         
-        prediction = int(model.predict(features)[0])
-        probability = float(model.predict_proba(features)[0][1])
-        verdict = "MALICIOUS" if prediction == 1 else "BENIGN"
+        # Use Probability to match Hive sensitivity
+        probs = clf.predict_proba(feat)
+        malicious_prob = probs[0][1]
+        
+        # Apply the 0.25 threshold
+        verdict = "MALICIOUS" if malicious_prob >= 0.25 else "BENIGN"
+        
+        v_color = Fore.RED if verdict == "MALICIOUS" else Fore.GREEN
+        print(f"{v_color}[⚡] LOCAL VERDICT: {verdict} (Confidence: {malicious_prob:.2f})")
 
-        if verdict == "MALICIOUS":
-            print(f"\n{Back.RED}{Fore.WHITE}{Style.BRIGHT} [!!!] SECURITY ALERT DETECTED [!!!] ")
-            print(f"{Fore.RED}PROCESS: {log.Image}")
-            print(f"{Fore.RED}RISK:    {probability*100:.2f}%")
-        else:
-            # FIX: Extract the filename using os.path.basename outside the f-string curly braces
-            proc_name = os.path.basename(log.Image)
-            print(f"{Fore.GREEN}[OK] Benign Activity: {proc_name}")
-
-        return {"verdict": verdict, "risk_score": round(probability, 4)}
+    # Ship to Hive
+    print(f"[📫] SHIPPING TO HIVE: {HIVE_URL}...")
+    headers = {"X-AEGIS-KEY": API_KEY, "Content-Type": "application/json"}
+    try:
+        response = requests.post(HIVE_URL, json=drill_data, headers=headers, timeout=5)
+        print(f"{Fore.GREEN}[✅] HIVE RESPONSE: {response.status_code} - {response.json()}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"{Fore.RED}[X] CONNECTION ERROR: {str(e)}")
 
 if __name__ == "__main__":
-    import uvicorn
-    # Use 0.0.0.0 so the container can communicate with your Windows host
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    run_sentinel_drill()
