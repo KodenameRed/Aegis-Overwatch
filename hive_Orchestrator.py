@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()  # This searches for a .env file and loads its keys
 import os, json, time, joblib, csv, uvicorn
 import pandas as pd
 from pathlib import Path
