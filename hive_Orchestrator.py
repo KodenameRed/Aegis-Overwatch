@@ -23,7 +23,12 @@ LAB_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 # Security Config
 API_KEY_NAME = "X-AEGIS-KEY"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=True)
-AEGIS_API_KEY = os.getenv("AEGIS_API_KEY", "Burn_Greek_Fire_Burn1088")
+AEGIS_API_KEY = os.getenv("AEGIS_API_KEY") 
+
+# Add a check to ensure it exists
+if not AEGIS_API_KEY:
+    print(f"{Fore.RED}[!] CRITICAL: AEGIS_API_KEY environment variable not set.")
+    exit(1)
 
 # AI Setup
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
