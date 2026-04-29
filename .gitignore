@@ -1,6 +1,5 @@
 # Aegis Core Secrets (CRITICAL)
 .env
-core/.env
 
 # Virtual Environments
 venv/
@@ -8,19 +7,19 @@ env/
 
 # Python Cache & Compilation
 __pycache__/
-*.py[cod]
+*.py[co]
 *$py.class
 *.so
 build/
 
 # Local Telemetry, Databases & Logs
-core/data/*.db
-core/data/*.db-shm
-core/data/*.db-wal
-core/data/*.json
-core/data/*.jsonl
-core/data/*.log
-data/
+# We ignore the local forensic logs but allow the /data folder structure
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.json
+data/*.jsonl
+data/*.log
 *.log
 .shutdown
 
