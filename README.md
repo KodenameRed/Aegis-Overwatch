@@ -14,20 +14,53 @@ The Dual-Hybrid SOC Agent (The Specialist): An autonomous worker powered by Gemi
 
 The Network Sentinel (The Watchman): A compiled C2 Socket specialist that performs real-time rhythm and volumetric analysis on network traffic to identify stealthy, robotic beaconing or data exfiltration.
 
-Code snippet
-graph TD
-    A[Kernel / Sysmon Sensors] --> B{Orchestrator Math Engine}
-    N[Network Sentinel] --> B
-    B -->|Deterministic Filter & ONNX Scoring| C[Zero-Trust Hub & Vault]
-    C -->|High-Risk Anomalies| D[MCP SOC Agent]
+flowchart LR
+    %% Styling Definitions
+    classDef base fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
+    classDef triage fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
+    classDef orchestrator fill:#eceff1,stroke:#607d8b,stroke-width:2px,color:#000
+    classDef socket fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000
+    classDef forensic fill:#e0f2f1,stroke:#00897b,stroke-width:2px,color:#000
+
+    %% Core Nodes
+    BaseHive["<b>BASE HIVE</b><br/>(Continuous Ingestion)<br/><i>Lightweight, persistent ingestion.<br/>Minimal host impact. Section 4.1</i>"]:::base
+
+    Triage["<b>v35k ONNX SPECIALIST</b><br/>(Triage Nurse)<br/><i>Every event processed.<br/>'S' is a simple risk score.<br/>Feature Vector identifies<br/>fundamental threat nature.<br/>Section 4.1</i>"]:::triage
+
+    Router["<b>ORCHESTRATOR &<br/>SPECIALIST ROUTER</b><br/><i>Functions as a Specialist Router.<br/>If S > 0.70, analyzes Feature Vector<br/>to select optimal socket.<br/>Section 4.2</i>"]:::orchestrator
+
+    Forensic["<b>LIVE FORENSIC<br/>CONTEXTUALIZATION</b><br/><i>Selected high-fidelity<br/>forensic agent performs<br/>deep, context-aware analysis.<br/>Section 4.2</i>"]:::forensic
+
+    %% Specialist Sockets Subgraph
+    subgraph Sockets ["SPECIALIST SOCKETS (Dynamic Just-In-Time (JIT) Provisioning. Not persistent. Only instantiated when DNA Markers are identified. Section 4.0)"]
+        direction TB
+        C2["<b>C2/NETWORK SCALPEL</b><br/>(e.g., Cozy Bear/APT29)<br/><i>For unusual network persistence.<br/>Analyzes beaconing jitter, rhythm drift.<br/>Section 4.2</i>"]:::socket
+        
+        Ransomware["<b>RANSOMWARE SPECIALIST</b><br/><i>For mass filesystem volatility.<br/>Analyzes encryption patterns.<br/>Future Agent. Section 4.2</i>"]:::socket
+        
+        Lolbin["<b>LATERAL/LOLBIN ABUSE SPECIALIST</b><br/><i>For script-heavy threats.<br/>Analyzes obfuscated CLI strings,<br/>token impersonation.<br/>Current Stable Prototype. Section 4.2</i>"]:::socket
+        
+        Extensible["<b>EXTENSIBLE SOCKET</b><br/><i>(Future Agent)</i>"]:::socket
+    end
+
+    %% Routing and Connections
+    BaseHive -->|Kernel Telemetry| Triage
+    BaseHive -->|Registry Changes| Triage
+    BaseHive -->|Network Activity| Triage
+
+    Triage -->|Risk Score 'S'| Router
+    Triage -->|FEATURE VECTOR 'DNA'| Router
+
+    Router -->|Activated| C2
+    Router -->|Activated| Ransomware
+    Router -->|Activated| Lolbin
+    Router -->|Activated| Extensible
+
+    C2 --> Forensic
+    Ransomware --> Forensic
+    Lolbin --> Forensic
+    Extensible --> Forensic
     
-    D -->|AI_ENGINE_MODE=CLOUD| E[Gemini 3.1 Flash <br/> High-Speed Concurrency]
-    D -->|Failsafe / LOCAL Mode| F[Llama 3.2:1B <br/> Air-Gapped Sovereign Core]
-    
-    E --> G[Nexus Master Dossier & UI Update]
-    F --> G
-    G --> H{Intent Governance Layer}
-    H -->|Authorized| I[Kinetic OS Remediation]
 ⚡ Core Features
 Dual-Hybrid Neural Routing: Set the engine to CLOUD for massive 10-thread parallel processing via Gemini, or LOCAL for strict, air-gapped Sovereign inference via Ollama. If the Cloud API drops or is rate-limited, Aegis automatically falls back to the Sovereign core without missing a beat.
 
