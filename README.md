@@ -13,57 +13,54 @@ It decouples the **Nervous System** (local sensors + math engine) from the **Bra
 ```mermaid
 flowchart LR
     %% Styling
-    classDef raw fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
-    classDef edge fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
-    classDef gateway fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000
-    classDef cloud fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000
-    classDef govern fill:#ffebee,stroke:#f44336,stroke-width:2px,color:#000
-    classDef terminal fill:#e0f2f1,stroke:#00897b,stroke-width:2px,color:#000
+    classDef edge fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
+    classDef hunter fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000
+    classDef neural fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
+    classDef airlock fill:#fbe9e7,stroke:#ff5722,stroke-width:2px,color:#000
+    classDef cognitive fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000
+    classDef execution fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#000
 
-    subgraph Edge ["🔒 Phase 1: Sovereign Local Core (Nervous System)"]
+    %% Edge Layer
+    subgraph Edge ["1. SOVEREIGN EDGE (Local Filtering)"]
         direction TB
-        Telemetry["<b>RAW OS TELEMETRY</b><br/><i>Native ETW & WFP Hooks</i>"]:::raw
-        Hunter["<b>STRATEGIC DB HUNTER</b><br/><i>Temporal Sweeps & Jitter-Trap Test</i>"]:::edge
-        ONNX["<b>DETERMINISTIC EDGE FILTERING</b><br/><i>v35k ONNX & Morphological Math</i>"]:::edge
+        Telemetry["<b>NATIVE TELEMETRY</b><br/><i>ETW & WFP Kernel Streams</i>"]:::edge
+        Sifter["<b>DETERMINISTIC SIFTER</b><br/><i>Morphological Math & Entropy</i><br/>Drops 95% of benign noise"]:::edge
+        Hunter["<b>STRATEGIC DB HUNTER</b><br/><i>Jitter-Traps & Nexus Sweeps</i><br/>Catches Low & Slow APTs"]:::hunter
+        Triage["<b>v35k ONNX SPECIALIST</b><br/><i>Neural Scoring & Lineage Checks</i><br/>S > 0.70 triggers orchestration"]:::neural
     end
 
-    subgraph Airlock ["🛡️ Phase 2: Zero-Trust Data Sanitization"]
+    %% The Privacy Airlock
+    Gateway["<b>CRYPTOGRAPHIC PRIVACY GATEWAY</b><br/><i>HMAC-SHA256 Masking & Semantic Airlock</i><br/>Prevents Prompt Injection & PII Leaks"]:::airlock
+
+    %% Cognitive Layer
+    subgraph Brain ["2. DUAL-HYBRID SYNTHESIS"]
         direction TB
-        Crypto["<b>CRYPTOGRAPHIC GATEWAY</b><br/><i>HMAC-SHA256 PII & Host Masking</i>"]:::gateway
-        Semantic["<b>SEMANTIC AIRLOCK</b><br/><i>Neutralizes Prompt-Poisoning & Base64</i>"]:::gateway
+        Cloud["<b>STRATEGIC CLOUD ACTUARY</b><br/><i>Hot-Swappable Frontier LLM</i><br/>Temporal Correlation & Playbooks"]:::cognitive
+        Failover["<b>LOCAL SOVEREIGN CORE</b><br/><i>Air-Gapped LLM</i><br/>Cognitive Failover (Degraded but Defended)"]:::cognitive
     end
 
-    subgraph Actuary ["☁️ Phase 3: Strategic Cloud Actuary (Brain)"]
+    %% Execution & Governance
+    subgraph Terminal ["3. CLINICAL REMEDIATION"]
         direction TB
-        Audit["<b>MASTER STRATEGIC AUDIT</b><br/><i>Aggregates 7-Day Nexus Dossier</i>"]:::cloud
-        LLM["<b>HOT-SWAPPABLE CLOUD LLM</b><br/><i>MITRE Mapping & Semantic Synthesis</i>"]:::cloud
+        Gov["<b>INTENT GOVERNANCE JUDGE</b><br/><i>Deterministic Veto Gatekeeper</i><br/>Mathematically prevents AI Self-Destruction"]:::execution
+        War["<b>WAR TERMINAL UI</b><br/><i>Pre-Staged Kinetic Actions</i><br/>(Isolate Host, Memory Dump, Revoke TGT)"]:::execution
     end
 
-    subgraph Execution ["⚡ Phase 4: Intent Governance & Remediation"]
-        direction TB
-        Judge["<b>INTENT GOVERNANCE JUDGE</b><br/><i>Mathematical Veto vs OS Self-Destruction</i>"]:::govern
-        WarTerm["<b>WAR TERMINAL UI</b><br/><i>Pre-Staged Actions (Isolate, Dump, Suspend)</i>"]:::terminal
-        Learn["<b>CRYPTOGRAPHIC RULE SEALING</b><br/><i>'Mark Safe & Learn' Organic Maturation</i>"]:::terminal
-    end
+    %% Flow Routes
+    Telemetry -->|Execution & OS Logs| Sifter
+    Telemetry -->|Network DB| Hunter
+    Sifter -->|High Risk Feature Vector| Triage
+    Hunter -->|7-Day Aggregated Chain| Triage
+    
+    Triage -->|Validated Threat DNA| Gateway
+    
+    Gateway -->|Sanitized Context| Cloud
+    Gateway -.->|Network Outage / Isolation| Failover
 
-    %% Flow Path
-    Telemetry --> Hunter
-    Telemetry --> ONNX
-    Hunter -->|Drops 95% benign noise| ONNX
-    
-    ONNX -->|Forwards Abstracted Threat DNA| Crypto
-    Hunter -.->|Triggers 12h Slow-and-Low Nexus| Audit
-    
-    Crypto --> Semantic
-    Semantic -->|Air-gapped Context Stream| LLM
-    Audit --> LLM
-    
-    LLM -->|Proposes SOAR Playbook| Judge
-    Judge -- "Intent Vetoed (Targeting svchost/lsass)" --> Judge
-    Judge -->|"Intent Mathematically Verified"| WarTerm
-    
-    WarTerm -.->|"Analyst Confirms Benign DevOps"| Learn
-    Learn -.->|"Injects Signed Rule to Failsafe"| ONNX
+    Cloud -->|Proposes Action Playbook| Gov
+    Failover -->|Proposes Action Playbook| Gov
+
+    Gov -->|Intent Verified| War
 ```
 
 ---
