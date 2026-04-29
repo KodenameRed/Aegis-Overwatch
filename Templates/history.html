@@ -1,0 +1,15 @@
+<html><head><title>Aegis Ledger</title>
+<style>body{background:#010409; color:#c9d1d9; font-family:'Inter', -apple-system, sans-serif; padding:40px;}</style>
+</head><body>
+<div style="max-width: 1000px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1 style="margin: 0; font-size: 24px; color: #F8FAFC; letter-spacing: 2px;">📜 PERSISTENT INCIDENT ARCHIVE</h1>
+            <p style="color: #8b949e; margin-top: 5px; font-size: 13px;">Immutable JSON ledger of all historical system events.</p>
+        </div>
+        <a href="/dashboard" style="color: #58a6ff; text-decoration: none; border: 1px solid #58a6ff50; padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 12px; background: rgba(88,166,255,0.1);">BACK TO DASHBOARD</a>
+    </div>
+    <div>
+        {{ cards_html | safe }}
+    </div>
+</div></body></html>

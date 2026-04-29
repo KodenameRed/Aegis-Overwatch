@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AEGIS | Enterprise Orchestrator</title>
+    <style>
+        * { box-sizing: border-box; }
+        :root { --bg: #010409; --panel: #0d1117; --border: #30363d; --card-bg: rgba(22, 27, 34, 0.6); --nexus: #d2a8ff; }
+        
+        /* 90% SOC ZOOM FIX */
+        html, body { zoom: 0.9; margin: 0; padding: 0; overflow: hidden; width: 100%; height: 100vh; background: var(--bg); color: #c9d1d9; font-family: 'Inter', -apple-system, sans-serif; }
+        
+        .viewport-wrapper { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; z-index: 1; overflow: hidden; }
+        .dashboard-container { display: flex; flex: 1; min-height: 0; width: 100%; }
+        
+        .sidebar { width: 270px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+        .main { flex: 1; padding: 30px; overflow-y: auto; scroll-behavior: smooth; background: radial-gradient(circle at top right, #161b22 0%, #010409 100%); }
+        .feed { width: 340px; background: var(--panel); border-left: 1px solid var(--border); overflow-y: auto; font-family: 'Consolas', monospace; font-size: 11px; flex-shrink: 0; }
+        
+        .bottom-bar { height: 60px; background: #0d1117; border-top: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; flex-shrink: 0; z-index: 20; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+        .core-btn:hover { background: rgba(255,255,255,0.05) !important; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 2px; }
+        
+        .theme-red { --theme-color: #ff4b2b; --theme-bg: rgba(255, 75, 43, 0.1); }
+        .theme-orange { --theme-color: #ffab40; --theme-bg: rgba(255, 171, 64, 0.1); }
+        .theme-green { --theme-color: #3fb950; --theme-bg: rgba(63, 185, 80, 0.1); }
+        .theme-grey { --theme-color: #8b949e; --theme-bg: rgba(139, 148, 158, 0.1); }
+        .theme-nexus { --theme-color: #d2a8ff; --theme-bg: rgba(210, 168, 255, 0.1); }
+
+        .card { background: var(--card-bg); margin-bottom: 15px; border-radius: 8px; border: 1px solid var(--border); border-left: 4px solid var(--theme-color); overflow: hidden; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .card-nexus { border: 1px solid var(--nexus); border-left: 6px solid var(--nexus); background: rgba(210, 168, 255, 0.03); animation: hazard-pulse-nexus 3s infinite; }
+        
+        .soar-btn { background: transparent; padding: 8px 12px; border-radius: 4px; font-size: 9px; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: 0.2s; text-align: center; margin-top: 5px; width: 100%; }
+        .soar-lat { border: 1px solid #ffab4050; color: #ffab40; background: rgba(255, 171, 64, 0.05); }
+        .soar-lat:hover { background: rgba(255, 171, 64, 0.15); box-shadow: 0 0 10px rgba(255,171,64,0.2); }
+        .soar-net { border: 1px solid #ff4b2b50; color: #ff4b2b; background: rgba(255, 75, 43, 0.05); }
+        .soar-net:hover { background: rgba(255, 75, 43, 0.15); box-shadow: 0 0 10px rgba(255,75,43,0.2); }
+
+        /* THE CROWN JEWEL STYLING */
+        .crown-jewel-btn {
+            background: linear-gradient(135deg, rgba(210, 168, 255, 0.1) 0%, rgba(210, 168, 255, 0.02) 100%);
+            border: 1px solid rgba(210, 168, 255, 0.4);
+            color: #d2a8ff;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 0 15px rgba(210, 168, 255, 0.15), inset 0 0 10px rgba(210, 168, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .crown-jewel-btn:hover {
+            background: linear-gradient(135deg, rgba(210, 168, 255, 0.15) 0%, rgba(210, 168, 255, 0.05) 100%);
+            border-color: rgba(210, 168, 255, 0.8);
+            box-shadow: 0 0 25px rgba(210, 168, 255, 0.3), inset 0 0 15px rgba(210, 168, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        .crown-jewel-btn:active { transform: translateY(1px); }
+
+        /* SOCKET BUTTON UPGRADES */
+        .socket-btn-stop { border: 1px solid rgba(255, 75, 43, 0.3) !important; color: #ff4b2b !important; background: rgba(255, 75, 43, 0.05) !important; }
+        .socket-btn-stop:hover { background: rgba(255, 75, 43, 0.15) !important; color: #ff7b72 !important; border-color: #ff4b2b !important; }
+        .socket-btn-start { border: 1px solid #30363d !important; color: #8b949e !important; background: transparent !important; }
+        .socket-btn-start:hover { background: rgba(63, 185, 80, 0.1) !important; color: #3fb950 !important; border-color: rgba(63, 185, 80, 0.4) !important; }
+
+        @keyframes hazard-pulse-red { 0% { box-shadow: 0 0 0 rgba(255,75,43,0); } 50% { box-shadow: 0 0 15px rgba(255,75,43,0.25); } 100% { box-shadow: 0 0 0 rgba(255,75,43,0); } }
+        @keyframes hazard-pulse-orange { 0% { box-shadow: 0 0 0 rgba(255,171,64,0); } 50% { box-shadow: 0 0 15px rgba(255,171,64,0.25); } 100% { box-shadow: 0 0 0 rgba(255,171,64,0); } }
+        @keyframes hazard-pulse-nexus { 0% { box-shadow: 0 0 0 rgba(210,168,255,0); } 50% { box-shadow: 0 0 20px rgba(210,168,255,0.3); } 100% { box-shadow: 0 0 0 rgba(210,168,255,0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes text-pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes foldAway { 
+            0% { transform: scale(1); opacity: 1; } 
+            50% { transform: scale(0.95); opacity: 0.5; background: rgba(63, 185, 80, 0.1); border-color: #3fb950; }
+            100% { transform: scale(0.9) translateY(20px); opacity: 0; height: 0; padding: 0; margin: 0; overflow: hidden; } 
+        }
+        .learning-animation { animation: foldAway 0.8s ease forwards !important; }
+
+        .theme-red.card-hazard { animation: hazard-pulse-red 2s infinite; }
+        .theme-orange.card-hazard { animation: hazard-pulse-orange 2s infinite; }
+
+        .score-pill { background: var(--theme-color); color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; letter-spacing: 1px; }
+        .theme-grey .score-pill, .theme-orange .score-pill { background: var(--theme-bg); color: var(--theme-color); border: 1px solid var(--theme-color); }
+        
+        summary { padding: 15px; cursor: pointer; list-style: none; outline: none; user-select: none; -webkit-user-select: none; }
+        .card-content { padding: 0 15px 15px 15px; font-size: 13px; background: transparent; }
+        .ai-header { font-weight: bold; color: #fff; margin-top: 10px; margin-bottom: 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid var(--border); padding-bottom: 4px; display: block; max-width: max-content; opacity: 0.8; }
+        .ai-section { margin: 0 0 15px 0; color: #d1d5db; padding-left: 10px; border-left: 2px solid var(--theme-color); font-size: 12px; line-height: 1.6; display: block; }
+        .cmd-terminal { background: #010409; padding: 12px; border-radius: 6px; border: 1px solid var(--border); font-family: 'Consolas', monospace; font-size: 11px; color: #a5d6ff; word-break: break-all; }
+        .admin-link { display: flex; align-items: center; gap: 10px; text-decoration: none; transition: 0.2s; cursor: pointer; padding: 10px 12px; border-radius: 6px; text-align: left; background: rgba(255,255,255,0.03); border: 1px solid var(--border); margin-bottom: 5px; }
+        .admin-link:hover { opacity: 0.8; filter: brightness(1.2); }
+        .s-btn { border-radius: 4px; padding: 4px 8px; font-size: 9px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .admin-link { display: flex; align-items: center; gap: 10px; text-decoration: none; transition: 0.2s; cursor: pointer; padding: 10px 12px; border-radius: 6px; text-align: left; background: rgba(255,255,255,0.03); border: 1px solid var(--border); margin-bottom: 5px; }
+        .admin-link:hover { opacity: 0.8; filter: brightness(1.2); }
+        .s-btn { border-radius: 4px; padding: 4px 8px; font-size: 9px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        
+        /* --- BASELINE CALIBRATION UI UPGRADES --- */
+        .hydro-box { padding: 15px; border-radius: 8px; border: 1px solid; margin-bottom: 15px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); transition: 0.3s; background-blend-mode: overlay; }
+        .hydro-sub { font-size: 10px; color: #8b949e; line-height: 1.5; margin: 8px 0 12px 0; }
+        
+        .hydro-btn { width: 100%; background: rgba(210,168,255,0.1); border: 1px solid rgba(210,168,255,0.4); color: #d2a8ff; padding: 10px; border-radius: 4px; font-size: 10px; font-weight: 900; letter-spacing: 1px; cursor: pointer; transition: 0.2s; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .hydro-btn:hover { background: rgba(210,168,255,0.25); box-shadow: 0 0 15px rgba(210,168,255,0.4); border-color: rgba(210,168,255,0.8); color: #fff; transform: translateY(-1px); }
+        .hydro-btn:active { transform: translateY(1px); }
+        
+        .hydro-abort { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; background: rgba(255,75,43,0.05); border: 1px solid rgba(255,75,43,0.3); color: #ff4b2b; padding: 8px; border-radius: 4px; font-size: 9px; font-weight: 900; letter-spacing: 1px; text-decoration: none; margin-top: 10px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .hydro-abort:hover { background: rgba(255,75,43,0.15); box-shadow: 0 0 15px rgba(255,75,43,0.3); border-color: rgba(255,75,43,0.6); color: #ff7b72; }
+        
+    </style>
+</head>
+<body>
+    </style>
+</head>
+<body>
+
+<div class="viewport-wrapper">
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="aegis-logo-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <svg width="52" height="34" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 12px; filter: drop-shadow(0px 4px 10px rgba(88, 166, 255, 0.25));">
+                    <path d="M12 14L22 30H2L12 14Z" fill="url(#grad_left)" stroke="#30363d" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M36 14L46 30H26L36 14Z" fill="url(#grad_right)" stroke="#30363d" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M24 2L38 30H10L24 2Z" fill="url(#grad_center)" stroke="#58a6ff" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M24 12L30 30H18L24 12Z" fill="#58a6ff" opacity="0.15"/>
+                    <path d="M18 30L24 20L30 30" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="grad_center" x1="24" y1="2" x2="24" y2="30" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#58a6ff" stop-opacity="0.6"/>
+                            <stop offset="1" stop-color="#010409" stop-opacity="0.95"/>
+                        </linearGradient>
+                        <linearGradient id="grad_left" x1="12" y1="14" x2="12" y2="30" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#8b949e" stop-opacity="0.3"/>
+                            <stop offset="1" stop-color="#010409" stop-opacity="0.95"/>
+                        </linearGradient>
+                        <linearGradient id="grad_right" x1="36" y1="14" x2="36" y2="30" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#8b949e" stop-opacity="0.3"/>
+                            <stop offset="1" stop-color="#010409" stop-opacity="0.95"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; margin-bottom: 5px;">
+                    <span style="font-family: 'Inter', system-ui, sans-serif; font-weight: 900; font-size: 24px; color: #F8FAFC; letter-spacing: 0.25em;">AEGIS</span>
+                    <span style="font-family: 'Inter', system-ui, sans-serif; font-weight: 600; font-size: 8px; color: #58a6ff; letter-spacing: 0.4em; text-transform: uppercase;">Overwatch</span>
+                </div>
+            </div>
+            
+            {{ vitals_widget | safe }}
+            <div style="color: #c9d1d9; font-size: 9px; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Detection Sensors</div>
+            {{ sockets_html | safe }}
+            {{ ledger_widget | safe }}
+        </div>
+        
+        <div class="main" id="main-view">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div>
+                    <div style="font-size: 18px; font-weight: 900; color: #F8FAFC; letter-spacing: 2px;">TACTICAL OPERATIONS</div>
+                    <div style="font-size: 10px; color: #8b949e; letter-spacing: 1px; margin-top: 4px; text-transform: uppercase;">Live Telemetry & Autonomous Response</div>
+                </div>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button onclick="actionWithSpinner(event, this, '/clear_alerts', 'CLEARING...', '#8b949e')" style="background:transparent; border:none; color:#8b949e; font-size:10px; font-weight:bold; letter-spacing:1px; cursor:pointer; transition:0.2s; opacity:0.5; display:flex; align-items:center; gap:6px;" onmouseover="this.style.opacity='1'; this.style.color='#c9d1d9'" onmouseout="this.style.opacity='0.5'; this.style.color='#8b949e'">
+                        <span style="font-size:14px;">🧹</span> CLEAR DASHBOARD
+                    </button>
+                    
+                    <div style="width: 1px; height: 25px; background: #30363d;"></div>
+                    
+                    {% if engine_mode == "LOCAL" %}
+                    <button onclick="actionWithSpinner(event, this, '/api/strategic_audit', 'AUDITING', '#d2a8ff')" style="background: rgba(210,168,255,0.05); border: 1px solid rgba(210,168,255,0.2); color: #d2a8ff; padding: 8px 15px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; opacity: 0.8; transition: 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                        <span style="font-size: 16px; filter: grayscale(100%);">🧮</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 900; font-size: 11px; letter-spacing: 1px;">STRATEGIC AUDIT</div>
+                            <div style="font-size: 8px; color: #8b949e;">*Mathematical Heuristics Only</div>
+                        </div>
+                    </button>
+                    {% else %}
+                    <button onclick="actionWithSpinner(event, this, '/api/strategic_audit', 'AUDITING', '#58a6ff')" style="background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3); color: #58a6ff; padding: 8px 15px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s;" onmouseover="this.style.background='rgba(88,166,255,0.2)'" onmouseout="this.style.background='rgba(88,166,255,0.1)'">
+                        <span style="font-size: 16px;">🧬</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 900; font-size: 11px; letter-spacing: 1px;">STRATEGIC AUDIT</div>
+                            <div style="font-size: 8px; color: #8b949e;">Cloud LLM Correlation</div>
+                        </div>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if rem_html %}
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid rgba(210,168,255,0.3); padding-bottom: 8px; margin-bottom: 15px;">
+                <div style="font-size:12px; font-weight:900; color:#d2a8ff; letter-spacing:2px; text-transform:uppercase; display:flex; align-items:center; gap:8px;">
+                    <div style="width:8px; height:8px; background:#d2a8ff; border-radius:50%; box-shadow:0 0 12px #d2a8ff; animation: text-pulse 1.5s infinite;"></div>ACTION REQUIRED
+                </div>
+            </div>
+            {{ rem_html | safe }}
+            {% endif %}
+
+            {{ nexus_compiling_html | safe }}
+            {{ killchain_cards | safe }}
+
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid #30363d; padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px;">
+                <div style="font-size:12px; font-weight:900; color:#58a6ff; letter-spacing:2px; text-transform:uppercase; display:flex; align-items:center; gap:8px;">
+                    <div style="width:6px; height:6px; background:#58a6ff; border-radius:50%; box-shadow:0 0 8px #58a6ff;"></div>NETWORK ALERTS
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <div style="font-size:9px; color:#58a6ff; font-weight:bold; font-family:monospace; background:rgba(88,166,255,0.1); padding:3px 8px; border-radius:4px; border: 1px solid rgba(88,166,255,0.3);">
+                        {{ "LIVE" if gw_cards_len else "STANDBY" }} [{{ gw_cards_len }}]
+                    </div>
+                </div>
+            </div>
+            <div id="gw-container">
+                {% if gw_cards %}
+                    {{ gw_cards | safe }}
+                {% else %}
+                    <div style="background: rgba(13, 17, 23, 0.5); border: 1px dashed #30363d; border-radius: 6px; padding: 25px; text-align: center; color: #484f58; font-size: 10px; letter-spacing: 2px; font-family: monospace; margin-bottom: 40px; box-shadow: inset 0 0 20px rgba(0,0,0,0.2);">
+                        <span style="opacity:0.5;">[//]</span> SYSTEM NOMINAL: NO BEHAVIORAL ANOMALIES IN PACKET WINDOW
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid rgba(255, 75, 43, 0.3); padding-bottom: 8px; margin-bottom: 15px; margin-top: 40px;">
+                <div style="font-size:12px; font-weight:900; color:#ff4b2b; letter-spacing:2px; text-transform:uppercase; display:flex; align-items:center; gap:8px;">
+                    <div style="width:8px; height:8px; background:#ff4b2b; border-radius:50%; box-shadow:0 0 12px #ff4b2b; {{ 'animation: text-pulse 1.5s infinite;' if active_cards_len else '' }}"></div>
+                    CRITICAL INCIDENT RESPONSE
+                </div>
+                <div style="font-size:9px; color:#ff4b2b; font-weight:bold; font-family:monospace; background:rgba(255,75,43,0.1); padding:3px 8px; border-radius:4px; border: 1px solid rgba(255,75,43,0.4);">
+                    ACTIVE THREATS [{{ active_cards_len }}]
+                </div>
+            </div>
+            <div id="lat-active-container">
+                {% if active_cards %}
+                    {{ active_cards | safe }}
+                {% else %}
+                    <div style="background: rgba(255, 75, 43, 0.02); border: 1px dashed rgba(255,75,43,0.2); border-radius: 6px; padding: 25px; text-align: center; color: #8b949e; font-size: 10px; letter-spacing: 2px; font-family: monospace; box-shadow: inset 0 0 20px rgba(0,0,0,0.2);">
+                        <span style="opacity:0.5;">[//]</span> ZERO ACTIVE THREATS REQUIRING SOC TRIAGE
+                    </div>
+                {% endif %}
+            </div>
+            
+            <details id="silent-telemetry-box" style="margin-top: 50px; background: rgba(13, 17, 23, 0.4); border: 1px solid #30363d; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <summary onclick="trackToggle('silent-telemetry-box')" style="padding: 15px; background: rgba(0,0,0,0.2); color:#8b949e; font-size:11px; letter-spacing:2px; font-weight:900; text-transform:uppercase; cursor:pointer; outline:none; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid transparent; transition: 0.2s;" onmouseover="this.style.color='#c9d1d9'; this.style.background='rgba(0,0,0,0.4)'" onmouseout="this.style.color='#8b949e'; this.style.background='rgba(0,0,0,0.2)'">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:6px; height:6px; background:#8b949e; border-radius:50%;"></div>SUPPRESSED TELEMETRY & LEARNED RULES
+                    </div>
+                    <div style="font-size:9px; font-weight:bold; font-family:monospace; background:rgba(139,148,158,0.1); border:1px solid rgba(139,148,158,0.2); padding: 3px 8px; border-radius:4px;">
+                        SUPPRESSED [{{ silent_telemetry_cards_len }}]
+                    </div>
+                </summary>
+                <div style="padding: 20px; opacity: 0.8; background: #010409; border-top: 1px solid #30363d;">
+                    {% if silent_telemetry_cards %}
+                        {{ silent_telemetry_cards | safe }}
+                    {% else %}
+                        <div style="text-align: center; color: #484f58; font-size: 10px; letter-spacing: 2px; font-family: monospace;">
+                            <span style="opacity:0.5;">[//]</span> NO BENIGN NOISE SUPPRESSED YET
+                        </div>
+                    {% endif %}
+                </div>
+            </details>
+        </div>
+
+        <div class="feed" id="log-feed">
+            <div style="padding: 15px; background: #010409; position: sticky; top: 0; border-bottom: 1px solid var(--border); font-size: 10px; opacity: 0.5; letter-spacing: 2px; font-weight:bold;">LIVE TELEMETRY STREAM</div>
+            {{ formatted_logs | safe }}
+        </div>
+    </div>
+    {{ bottom_bar | safe }}
+</div>
+
+{{ onboarding_modal | safe }}
+
+<script>
+let selectedEngine = '{{ engine_mode }}';
+let isUIPaused = false;
+let dismissedCards = new Set();
+let openDetailsState = {};
+let activeTabsState = {};
+let rawEvState = {};
+
+// Load preserved UI states from Session Storage
+try { 
+    openDetailsState = JSON.parse(sessionStorage.getItem('aegis_ui_state') || '{}'); 
+    activeTabsState = JSON.parse(sessionStorage.getItem('aegis_tab_state') || '{}');
+    rawEvState = JSON.parse(sessionStorage.getItem('aegis_raw_ev_state') || '{}');
+} catch(e) {}
+
+function trackToggle(id) {
+    setTimeout(() => {
+        const el = document.getElementById(id);
+        if(el) {
+            openDetailsState[id] = el.hasAttribute('open');
+            try { sessionStorage.setItem('aegis_ui_state', JSON.stringify(openDetailsState)); } catch(e) {}
+        }
+    }, 50);
+}
+
+function selectEngine(mode) {
+    selectedEngine = mode;
+    document.getElementById('path-cloud').style.borderColor = mode === 'CLOUD' ? '#58a6ff' : '#30363d';
+    document.getElementById('path-cloud').style.background = mode === 'CLOUD' ? 'rgba(88, 166, 255, 0.08)' : '#010409';
+    document.getElementById('path-local').style.borderColor = mode === 'LOCAL' ? '#d2a8ff' : '#30363d';
+    document.getElementById('path-local').style.background = mode === 'LOCAL' ? 'rgba(210, 168, 255, 0.08)' : '#010409';
+}
+
+async function sealVault(event) {
+    if(event) event.preventDefault();
+    const aegis = document.getElementById('setup-aegis').value;
+    const gemini = document.getElementById('setup-gemini').value;
+    const vt = document.getElementById('setup-vt').value;
+    if(!aegis || aegis.includes('your_')) { alert('Master Aegis Key is mandatory.'); return; }
+    
+    const btn = document.getElementById('vault-save-btn');
+    btn.innerText = "SEALING...";
+    isUIPaused = true;
+    
+    try {
+        const res = await fetch('/api/configure_vault', { 
+            method: 'POST', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ aegis_key: aegis, gemini_key: gemini, vt_key: vt, engine_mode: selectedEngine })
+        });
+        const json = await res.json();
+        if(json.status === 'success') {
+            document.body.innerHTML = "<div style='display:flex; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:#010409; color:#8b949e; justify-content:center; align-items:center; font-family:monospace; font-size:14px; flex-direction:column; z-index:9999;'><div style='color:#58a6ff; font-size:24px; font-weight:900; letter-spacing:3px; margin-bottom:15px; animation: text-pulse 1.5s infinite;'>🔄 REBOOTING ENGINE</div><div style='color:#c9d1d9;'>Swapping Cognitive Cores and flushing kernel locks...</div></div>";
+            setTimeout(() => { location.reload(); }, 4000);
+        } else {
+            alert("Error: " + json.message);
+            btn.innerText = "Seal Vault & Ignite Core";
+            isUIPaused = false;
+        }
+    } catch(e) { setTimeout(() => location.reload(), 1000); }
+}
+
+function openVault() { 
+    const modal = document.getElementById('vault-setup-overlay');
+    if (modal) modal.style.display = 'flex'; 
+}
+
+async function powerOff(event, btn) {
+    event.preventDefault();
+    if(!confirm("Are you sure you want to securely terminate the Aegis Orchestrator?")) return;
+    
+    isUIPaused = true;
+    document.body.innerHTML = `
+    <div style='display:flex; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:#010409; color:#8b949e; justify-content:center; align-items:center; font-family:monospace; font-size:14px; flex-direction:column; z-index:9999;'>
+        <div style='color:#ff4b2b; font-size:24px; font-weight:900; letter-spacing:3px; margin-bottom:15px; animation: text-pulse 1.5s infinite;'>⏻ INITIATING GRACEFUL SHUTDOWN</div>
+        <div style='color:#c9d1d9; margin-bottom: 5px;'>Securing cryptographic vault...</div>
+        <div style='color:#c9d1d9; margin-bottom: 5px;'>Terminating background sensors...</div>
+        <div style='color:#c9d1d9;'>Halting orchestration engine.</div>
+    </div>`;
+
+    try { await fetch('/api/shutdown'); } catch(e) {} 
+    setTimeout(() => { document.body.innerHTML = `<div style='display:flex; position:fixed; top:0; left:0; right:0; bottom:0; width:100%; height:100%; background:#010409; color:#8b949e; justify-content:center; align-items:center; font-family:monospace; font-size:14px; flex-direction:column; z-index:9999;'><div style='color:#ff4b2b; font-size:24px; font-weight:900; letter-spacing:3px; margin-bottom:15px;'>⏻ SYSTEM OFFLINE</div><div style='color:#c9d1d9;'>Aegis Core has been securely terminated.</div><div style='margin-top:15px; opacity:0.5; font-size:11px;'>You may now safely close this browser tab.</div></div>`; }, 1500);
+}
+
+function actionWithSpinner(event, btn, url, loadingText, color) {
+    event.preventDefault();
+    if (isUIPaused) return;
+    isUIPaused = true;
+    
+    btn.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><div style="font-size: 14px; animation: spin 1s linear infinite;">⏳</div><div style="text-align:left;"><div style="color: ${color}; font-weight: bold; font-size: 10px; letter-spacing: 1px;">${loadingText}</div></div></div>`;
+    btn.style.pointerEvents = "none";
+    btn.style.opacity = "0.7";
+
+    // --- VISUALLY WIPE THE FEED WHEN 'CLEAR DASHBOARD' IS CLICKED ---
+    if (url === '/clear_alerts') {
+        const feed = document.getElementById('log-feed');
+        if (feed) feed.innerHTML = '<div style="padding: 15px; background: #010409; position: sticky; top: 0; border-bottom: 1px solid var(--border); font-size: 10px; opacity: 0.5; letter-spacing: 2px; font-weight:bold;">LIVE TELEMETRY STREAM</div><div style="padding: 30px; color: #8b949e; font-family: monospace; font-size: 11px; text-align: center;">[📦] Telemetry visually cleared...</div>';
+    }
+
+    fetch(url).then(() => setTimeout(() => location.reload(), 600)).catch(() => location.reload());
+}
+
+function startHydration(event, btn) { 
+    actionWithSpinner(event, btn, '/api/start_hydration', 'CALIBRATING...', '#58a6ff');
+} 
+
+function triggerStrategicAudit(event, btn) {
+    event.preventDefault();
+    if (isUIPaused) return;
+    isUIPaused = true;
+    
+    btn.innerHTML = `<span style="font-size: 20px; animation: spin 1s linear infinite;">⏳</span> 
+                     <div style="text-align: left;">
+                         <div style="font-size: 11px; font-weight: 900; letter-spacing: 1.5px;">AUDITING...</div>
+                         <div style="font-size: 8px; opacity: 0.7; font-weight: normal; margin-top: 2px; letter-spacing: 0.5px;">Please Stand By</div>
+                     </div>`;
+    btn.style.pointerEvents = "none";
+    btn.style.opacity = "0.7";
+
+    fetch('/api/strategic_audit').then(() => setTimeout(() => location.reload(), 600)).catch(() => location.reload());
+}
+
+function dispatchSOAR(event, btn, action, target, uid = null) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Prevent double-triggering if already armed
+    if (btn.dataset.armed === "true") return; 
+    if (isUIPaused) return;
+    
+    if (action.includes('REVERT')) {
+        isUIPaused = true;
+        btn.innerHTML = `⏳ DISMISSING...`;
+        setTimeout(() => location.reload(), 800);
+        return;
+    }
+
+    isUIPaused = true;
+    btn.innerHTML = `⏳ VERIFYING VIA GOVERNANCE JUDGE...`;
+    btn.style.opacity = "0.7";
+    btn.style.pointerEvents = "none";
+
+    fetch('/api/ui_remediation', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ action: action, target: target })
+    }).then(res => res.json()).then(data => {
+        btn.style.opacity = "1";
+        if (data.status === "blocked") {
+            btn.style.background = "rgba(255, 75, 43, 0.3)";
+            btn.style.color = "#ff4b2b";
+            btn.style.borderColor = "#ff4b2b50";
+            btn.innerHTML = `🛑 GOVERNANCE BLOCK: ${data.reason || 'Protected System Process'}`;
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            // Step 2: Governance Passed, await final Human Authorization
+            btn.style.background = "rgba(210, 168, 255, 0.15)";
+            btn.style.color = "#d2a8ff";
+            btn.style.borderColor = "#d2a8ff50";
+            btn.innerHTML = `⚖️ GOVERNANCE APPROVED: CLICK TO AUTHORIZE STRIKE`;
+            btn.style.pointerEvents = "auto";
+            btn.dataset.armed = "true";
+            
+            // KEEP UI PAUSED so the background refresh doesn't wipe the button!
+            isUIPaused = true; 
+            
+            // Auto-disarm after 10 seconds if they walk away without clicking
+            let disarmTimer = setTimeout(() => {
+                isUIPaused = false; // Let the dashboard refresh naturally to reset the button
+            }, 10000);
+            
+            // Override the button click for the final execution
+            btn.onclick = function(e) {
+                e.preventDefault(); e.stopPropagation();
+                clearTimeout(disarmTimer); // Cancel the auto-disarm
+                
+                btn.innerHTML = `✅ KINETIC STRIKE DEPLOYED`;
+                btn.style.background = "rgba(63, 185, 80, 0.15)";
+                btn.style.color = "#3fb950";
+                btn.style.borderColor = "#3fb95050";
+                btn.style.pointerEvents = "none";
+                
+                if (uid) {
+                    fetch('/api/resolve_audit/' + uid).then(() => setTimeout(() => location.reload(), 1000));
+                } else {
+                    setTimeout(() => location.reload(), 1000);
+                }
+            };
+        }
+    }).catch(() => location.reload());
+}
+
+function internalizeRule(event, image, parent, cmd, sig) {
+    event.preventDefault();
+    event.stopPropagation();
+    const btn = event.currentTarget;
+    if (isUIPaused) return;
+    isUIPaused = true;
+
+    // 1. Instant button feedback
+    btn.innerHTML = `<span style="font-size:12px; animation: spin 1s linear infinite; display:inline-block;">⏳</span> INTERNALIZING...`;
+    btn.style.opacity = "1";
+    btn.style.pointerEvents = "none";
+    btn.style.background = "rgba(63, 185, 80, 0.2)";
+    btn.style.color = "#fff";
+
+    // 2. Find the parent card and trigger the fold animation
+    const card = btn.closest('.card');
+    
+    fetch('/api/internalize_rule', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-aegis-key': '{{ aegis_key }}', // <--- Injecting the key from Python
+            'x-aegis-signature': 'UI_AUTHORIZED_SESSION' // <--- Bypass signature for UI
+        },
+        body: JSON.stringify({ image: image, parent: parent, command_snippet: cmd, signature: sig })
+    }).then(() => {
+        // 3. Success feedback before the reload
+        btn.innerHTML = `✔️ SECURELY INTERNALIZED`;
+        btn.style.background = "rgba(63, 185, 80, 0.4)";
+        
+        if (card) {
+            card.classList.add('learning-animation');
+        }
+
+        // 4. Give the animation time to play out before reloading
+        setTimeout(() => {
+            isUIPaused = false; 
+            location.reload(); 
+        }, 800);
+    }).catch(() => {
+        isUIPaused = false;
+        location.reload();
+    });
+}
+
+function dismissAlert(event, type, sig, elementId) {
+    event.preventDefault(); 
+    event.stopPropagation();
+    dismissedCards.add(elementId);
+    const el = document.getElementById(elementId);
+    if (el) el.remove(); 
+    fetch('/dismiss_alert/' + type + '/' + sig);
+}
+
+function copyTelemetry(jsonElementId) {
+    let jsonBlock = document.getElementById(jsonElementId);
+    if(!jsonBlock) {
+        alert("Could not locate telemetry artifacts.");
+        return;
+    }
+    
+    // Use textContent to grab data even if the dropdown is closed
+    let rawText = jsonBlock.textContent; 
+    let jsonStart = rawText.indexOf('{');
+    let cleanJson = jsonStart !== -1 ? rawText.substring(jsonStart).trim() : rawText.trim();
+    
+    navigator.clipboard.writeText(cleanJson).then(() => {
+        alert("✅ Sanitized Telemetry Copied to Clipboard.");
+    });
+}
+
+function toggleRawEvidence(uid) {
+    const el = document.getElementById('raw_ev_' + uid);
+    if (el) { 
+        const isHidden = (el.style.display === 'none' || el.style.display === '');
+        el.style.display = isHidden ? 'block' : 'none'; 
+        rawEvState[uid] = isHidden;
+        try { sessionStorage.setItem('aegis_raw_ev_state', JSON.stringify(rawEvState)); } catch(e) {}
+    }
+}
+
+function toggleBriefing(uid, tier) {
+    const t1 = document.getElementById('brief_t1_' + uid);
+    const t3 = document.getElementById('brief_t3_' + uid);
+    const b1 = document.getElementById('btn_t1_' + uid);
+    const b3 = document.getElementById('btn_t3_' + uid);
+    
+    if(tier === 1) {
+        if(t1) t1.style.display = 'block';
+        if(t3) t3.style.display = 'none';
+        if(b1) { b1.style.background = 'rgba(88,166,255,0.1)'; b1.style.color = '#58a6ff'; b1.style.borderColor = '#30363d'; b1.style.borderBottom = 'none'; }
+        if(b3) { b3.style.background = 'transparent'; b3.style.color = '#8b949e'; b3.style.borderColor = 'transparent'; }
+    } else {
+        if(t1) t1.style.display = 'none';
+        if(t3) t3.style.display = 'block';
+        if(b3) { b3.style.background = 'rgba(210,168,255,0.1)'; b3.style.color = '#d2a8ff'; b3.style.borderColor = '#30363d'; b3.style.borderBottom = 'none'; }
+        if(b1) { b1.style.background = 'transparent'; b1.style.color = '#8b949e'; b1.style.borderColor = 'transparent'; }
+    }
+
+    // Save active tab state
+    activeTabsState[uid] = tier;
+    try { sessionStorage.setItem('aegis_tab_state', JSON.stringify(activeTabsState)); } catch(e) {}
+}
+
+function createMockTicket(uid) { alert('✅ [Mock] Ticket Created in ServiceNow.\nDossier: ' + uid + '\nStatus: Assigned to Tier 2 SOC queue.'); }
+function exportMockSTIX(uid) { alert('📥 [Mock] Generating STIX 2.1 JSON bundle for ' + uid + '. \nInitiating download...'); }
+
+async function refresh() {
+    if (isUIPaused) return;
+    
+    try {
+        const res = await fetch('/dashboard');
+        if(res.status !== 200) return;
+        const html = await res.text();
+        
+        if (isUIPaused) return; // double check in case user clicked during fetch
+        
+        const mainView = document.getElementById('main-view');
+        const scrollPos = mainView ? mainView.scrollTop : 0;
+        
+        // Capture inner scroll states for JSON boxes
+        const innerScrollStates = {};
+        document.querySelectorAll('.cmd-terminal').forEach(el => {
+            if (el.parentElement && el.parentElement.id) {
+                innerScrollStates[el.parentElement.id] = el.scrollTop;
+            }
+        });
+
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        
+        const sidebarHtml = doc.querySelector('.sidebar');
+        if (sidebarHtml) document.querySelector('.sidebar').innerHTML = sidebarHtml.innerHTML;
+        
+        const mainHtml = doc.getElementById('main-view');
+        if (mainHtml) document.getElementById('main-view').innerHTML = mainHtml.innerHTML;
+        
+        const logHtml = doc.getElementById('log-feed');
+        if (logHtml) document.getElementById('log-feed').innerHTML = logHtml.innerHTML;
+        
+        const bottomBarHtml = doc.querySelector('.bottom-bar');
+        if (bottomBarHtml) document.querySelector('.bottom-bar').innerHTML = bottomBarHtml.innerHTML;
+        
+        // 1. Restore Dropdown Accordion States
+        Object.keys(openDetailsState).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (openDetailsState[id]) el.setAttribute('open', '');
+                else el.removeAttribute('open');
+            }
+        });
+
+        // 2. Restore Active Tabs (Tier 1 vs Tier 3)
+        Object.keys(activeTabsState).forEach(uid => {
+            if(document.getElementById('brief_t1_' + uid)) {
+                toggleBriefing(uid, activeTabsState[uid]);
+            }
+        });
+
+        // 3. Restore Raw Evidence Views
+        Object.keys(rawEvState).forEach(uid => {
+            const el = document.getElementById('raw_ev_' + uid);
+            if(el && rawEvState[uid]) {
+                el.style.display = 'block';
+            }
+        });
+        
+        // 4. Enforce Dismissed Card Blacklist
+        dismissedCards.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.remove(); 
+        });
+        
+        // 5. Restore JSON box scroll positions
+        Object.keys(innerScrollStates).forEach(id => {
+            const parentEl = document.getElementById(id);
+            if (parentEl) {
+                const preEl = parentEl.querySelector('.cmd-terminal');
+                if (preEl) preEl.scrollTop = innerScrollStates[id];
+            }
+        });
+        
+        if (document.getElementById('main-view')) document.getElementById('main-view').scrollTop = scrollPos;
+    } catch(e) {}
+}
+
+setInterval(refresh, 1500); 
+
+function secureWipe(event, btn) {
+    event.preventDefault();
+    
+    // Proper SIEM "Are you sure?" protocol
+    const confirmation = confirm("⚠️ CRITICAL WARNING: STERILIZATION PROTOCOL ⚠️\n\nThis action will PERMANENTLY destroy all forensic telemetry, active incident ledgers, and deep-storage SQL databases.\n\nThis is a destructive action designed for post-simulation cleanup.\n\nAre you absolutely sure you want to proceed?");
+    
+    if (!confirmation) return;
+    
+    // If they say yes, execute the kill command
+    actionWithSpinner(event, btn, '/wipe', 'STERILIZING...', '#ff4b2b');
+}
+</script>
+</body>
+</html>
