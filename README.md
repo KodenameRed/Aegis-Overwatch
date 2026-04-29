@@ -1,22 +1,18 @@
-🛡️ Aegis Overwatch: Autonomous AI-Driven XDR
-The Zero-Trust, Dual-Hybrid Intelligence Framework
 
-Aegis Overwatch is a bleeding-edge, autonomous Endpoint Detection and Response (EDR) framework. Unlike traditional signature-based tools, Aegis utilizes a hybrid mathematical and neural architecture to bridge the gap between raw kernel telemetry and high-level cognitive reasoning.
+🛡️ **Aegis Overwatch**: Autonomous AI-Driven XDR  
+**The Zero-Trust, Dual-Hybrid Intelligence Framework**
 
-Designed for high-security environments, Aegis operates by decoupling the "Nervous System" (Local Sensors & Math Engine) from the "Brain" (LLM-driven Triage). It features a dynamic Dual-Hybrid Routing System—utilizing cloud-scale AI for lightning-fast concurrent triage, while maintaining an air-gapped Sovereign AI core as an absolute failsafe.
+Aegis Overwatch is a bleeding-edge, autonomous Endpoint Detection and Response (EDR) framework. Unlike traditional signature-based tools, Aegis uses a hybrid mathematical + neural architecture to bridge raw kernel telemetry and high-level cognitive reasoning.
 
-🏗️ The Aegis Architecture
-Aegis functions through tightly integrated layers that communicate via a secure, authenticated API.
+It decouples the **Nervous System** (local sensors + math engine) from the **Brain** (LLM-driven triage) and features a dynamic **Dual-Hybrid Routing System** — cloud-scale AI for speed and an air-gapped Sovereign core as absolute failsafe.
 
-The Orchestrator (The Spine): A FastAPI-driven hub that ingests telemetry, manages the real-time SQLite Forensic Ledger, and hosts the Live Triage War Terminal. It runs raw math and ONNX models to filter 95% of noise before AI intervention.
+---
 
-The Dual-Hybrid SOC Agent (The Specialist): An autonomous worker powered by Gemini 3.1 Flash (Cloud) and Llama 3.2:1B (Sovereign Local). It consumes high-risk alerts via the Model Context Protocol (MCP), performs forensic triage, and authorizes kinetic SOAR remediation.
-
-The Network Sentinel (The Watchman): A compiled C2 Socket specialist that performs real-time rhythm and volumetric analysis on network traffic to identify stealthy, robotic beaconing or data exfiltration.
+### 🏗️ The Aegis Architecture
 
 ```mermaid
 flowchart LR
-    %% Styling Definitions
+    %% Styling
     classDef base fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
     classDef triage fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
     classDef orchestrator fill:#eceff1,stroke:#607d8b,stroke-width:2px,color:#000
@@ -24,33 +20,30 @@ flowchart LR
     classDef forensic fill:#e0f2f1,stroke:#00897b,stroke-width:2px,color:#000
 
     %% Core Nodes
-    BaseHive["<b>BASE HIVE</b><br/>(Continuous Ingestion)<br/><i>Lightweight, persistent ingestion.<br/>Minimal host impact. Section 4.1</i>"]:::base
+    BaseHive["<b>BASE HIVE</b><br/>(Continuous Ingestion)<br/><i>Lightweight, persistent ingestion.<br/>Minimal host impact.</i>"]:::base
 
-    Triage["<b>v35k ONNX SPECIALIST</b><br/>(Triage Nurse)<br/><i>Every event processed.<br/>'S' is a simple risk score.<br/>Feature Vector identifies<br/>fundamental threat nature.<br/>Section 4.1</i>"]:::triage
+    Triage["<b>v35k ONNX SPECIALIST</b><br/>(Triage Nurse)<br/><i>Every event processed.<br/>'S' = simple risk score.</i>"]:::triage
 
-    Router["<b>ORCHESTRATOR &<br/>SPECIALIST ROUTER</b><br/><i>Functions as a Specialist Router.<br/>If S > 0.70, analyzes Feature Vector<br/>to select optimal socket.<br/>Section 4.2</i>"]:::orchestrator
+    Router["<b>ORCHESTRATOR & SPECIALIST ROUTER</b><br/><i>If S > 0.70 → routes to correct socket.</i>"]:::orchestrator
 
-    Forensic["<b>LIVE FORENSIC<br/>CONTEXTUALIZATION</b><br/><i>Selected high-fidelity<br/>forensic agent performs<br/>deep, context-aware analysis.<br/>Section 4.2</i>"]:::forensic
+    Forensic["<b>LIVE FORENSIC CONTEXTUALIZATION</b><br/><i>Deep context-aware analysis.</i>"]:::forensic
 
-    %% Specialist Sockets Subgraph
-    subgraph Sockets ["SPECIALIST SOCKETS (Dynamic Just-In-Time (JIT) Provisioning. Not persistent. Only instantiated when DNA Markers are identified. Section 4.0)"]
+    %% Specialist Sockets
+    subgraph Sockets ["SPECIALIST SOCKETS (JIT Provisioning)"]
         direction TB
-        C2["<b>C2/NETWORK SCALPEL</b><br/>(e.g., Cozy Bear/APT29)<br/><i>For unusual network persistence.<br/>Analyzes beaconing jitter, rhythm drift.<br/>Section 4.2</i>"]:::socket
-        
-        Ransomware["<b>RANSOMWARE SPECIALIST</b><br/><i>For mass filesystem volatility.<br/>Analyzes encryption patterns.<br/>Future Agent. Section 4.2</i>"]:::socket
-        
-        Lolbin["<b>LATERAL/LOLBIN ABUSE SPECIALIST</b><br/><i>For script-heavy threats.<br/>Analyzes obfuscated CLI strings,<br/>token impersonation.<br/>Current Stable Prototype. Section 4.2</i>"]:::socket
-        
-        Extensible["<b>EXTENSIBLE SOCKET</b><br/><i>(Future Agent)</i>"]:::socket
+        C2["<b>C2 / NETWORK SCALPEL</b><br/><i>Beaconing & jitter analysis</i>"]:::socket
+        Ransomware["<b>RANSOMWARE SPECIALIST</b><br/><i>Filesystem volatility</i>"]:::socket
+        Lolbin["<b>LATERAL / LOLBIN SPECIALIST</b><br/><i>Script & CLI abuse</i>"]:::socket
+        Extensible["<b>EXTENSIBLE SOCKET</b><br/><i>Future agents</i>"]:::socket
     end
 
-    %% Routing and Connections
+    %% Flow
     BaseHive -->|Kernel Telemetry| Triage
     BaseHive -->|Registry Changes| Triage
     BaseHive -->|Network Activity| Triage
 
     Triage -->|Risk Score 'S'| Router
-    Triage -->|FEATURE VECTOR 'DNA'| Router
+    Triage -->|Feature Vector| Router
 
     Router -->|Activated| C2
     Router -->|Activated| Ransomware
@@ -61,83 +54,64 @@ flowchart LR
     Ransomware --> Forensic
     Lolbin --> Forensic
     Extensible --> Forensic
-    
-⚡ Core Features
-Dual-Hybrid Neural Routing: Set the engine to CLOUD for massive 10-thread parallel processing via Gemini, or LOCAL for strict, air-gapped Sovereign inference via Ollama. If the Cloud API drops or is rate-limited, Aegis automatically falls back to the Sovereign core without missing a beat.
+```
 
-Nexus Dossier Compilation: Automatically correlates disparate host (lateral) and network (gateway) anomalies over a 60-second temporal window, generating a highly technical, multi-vector Kill-Chain Executive Summary.
+---
 
-Neural Specialist Pre-Scoring: Utilizes a local v35k ONNX model for sub-millisecond behavioral scoring before any telemetry touches the LLM.
+### ⚡ Core Features
 
-Deterministic Intent Governance: A hardcoded safety layer that intercepts AI-proposed actions. It prevents the AI from targeting critical system primitives (e.g., explorer.exe, lsass.exe) regardless of the threat score.
+- **Dual-Hybrid Neural Routing** — Cloud (Gemini) or Sovereign Local (Ollama) with automatic fallback
+- **Nexus Dossier Compilation** — Auto-correlates host + network anomalies into executive summaries
+- **Neural Specialist Pre-Scoring** — v35k ONNX model does sub-millisecond triage
+- **Deterministic Intent Governance** — Hardcoded safety layer prevents dangerous AI actions
+- **Network Jitter Analysis** — Detects robotic C2 beaconing via rhythm & volume baselines
 
-Network Jitter Analysis: Detects robotic C2 beaconing by analyzing packet rhythm, volume, and exact jitter variance against historical baselines, effectively filtering out benign Cloud/CDN traffic.
+---
 
-🚀 Deployment & Onboarding Guide
-Aegis is designed for rapid, frictionless deployment with an automated setup and a guided, web-based initialization process.
+### 🚀 Deployment & Onboarding
 
-1. Prerequisites
-Windows 10/11 (Admin privileges required).
+**Prerequisites**
+- Windows 10/11 (Admin rights required)
+- Python 3.10+
+- Npcap (for Network Sentinel)
+- Ollama (optional but recommended for Sovereign mode)
 
-Python 3.10+.
-
-Npcap (Required for the Network Sentinel).
-
-Ollama (Optional, but required for Sovereign/Local fallback mode).
-
-2. The One-Click Deploy
-Run the automated deployment script to bootstrap the environment:
-
-PowerShell
+**One-Click Deploy**
+```powershell
 .\Deploy-Aegis.bat
-What it does: Creates the Virtual Environment (venv), installs all dependencies (FastAPI, ONNX, MCP, Google GenAI, OpenAI), initializes the SQLite database and Neural Vault directories, drops an easy-access Shortcut on your Desktop, and automatically launches the Aegis Engine upon completion.
+```
 
-3. Vault Initialization & Key Setup
-Once the deployment script finishes, it will automatically launch Aegis-Switch.bat and open the local War Terminal (http://127.0.0.1:8000/dashboard). (For future use, you can simply double-click your new Aegis Overwatch Desktop shortcut or run Aegis-Switch.bat manually).
+This script:
+- Creates a clean virtual environment
+- Installs all dependencies (FastAPI, Jinja2, ONNX, etc.)
+- Sets up Ollama automatically if missing
+- Creates a desktop shortcut
+- Launches the C2 console
 
-Upon first boot, the UI will lock down and present the System Initialization Modal. You will be guided through three onboarding steps:
+After deployment, open `Aegis-Switch.bat` (or the desktop shortcut) → the web dashboard will open at `http://localhost:8000/dashboard`.
 
-Cryptographic Master Key (Required): You must create a custom Aegis Master Key. This acts as a cryptographic salt (HMAC-SHA256) to sign your behavior whitelists and authenticate local telemetry. Your key never leaves the machine.
+**First-Time Setup**
+The UI will guide you through:
+1. Creating your cryptographic master key (AEGIS_API_KEY)
+2. Choosing Cloud (Gemini) or Sovereign (Ollama) mode
+3. (Optional) Adding VirusTotal API key
 
-Intelligence Core Selection: Choose your primary engine.
+---
 
-CLOUD (Shielded): Select this for maximum speed and logic. You will be prompted to insert a Google Gemini API Key (Obtain a free key from Google AI Studio).
+### 🛠️ Tech Stack
 
-SOVEREIGN (Air-Gapped): Select this to keep all inference strictly local using Llama 3.2:1B via Ollama.
+- **Intelligence**: Gemini 1.5 Flash (Cloud) + Llama 3.2 1B (Sovereign via Ollama)
+- **Backend**: FastAPI + Uvicorn + SQLite (WAL)
+- **Forensics**: ONNX models, Npcap, Sysmon integration
+- **Security**: HMAC-SHA256 signing, Deterministic Intent Governance
 
-Threat Intelligence Feed (Optional): To enable the UI's real-time malicious signature badges, paste your VirusTotal API key (Obtain a free key here).
+---
 
-Click "Seal Vault & Ignite Core". Aegis will automatically generate your secure .env file, spin up the SOC Agents in the background, and begin protecting the host.
+**License**  
+MIT License — see [LICENSE](LICENSE) for details.
 
-🕹️ Operational Control
-Aegis uses a simplified "Switch" system to manage the stack.
+**Author**: Jacob Derwojed (KodenameRed)
 
-Aegis-Switch.bat (or Desktop Shortcut)
-This is your primary command interface.
+---
 
-Start Engine: Launches the Orchestrator, the SOC Agent, and the Network Sentinel in synchronized background windows.
 
-Stop Engine: Gracefully terminates all background workers using OS-level SIGKILLs and flushes the buffer.
-
-Aegis-Control.bat
-Used for advanced maintenance:
-
-Clear Dashboard: Archives the current Active Incident Buffer to immutable storage.
-
-Compact Forensic Ledger: Purges raw SQLite packet data older than 24 hours while preserving AI-generated behavior baselines.
-
-Sterilize Environment: A "Wipe" command that permanently destroys all SQL and JSON ledgers for post-simulation cleanup.
-
-🛠️ Tech Stack
-Intelligence: Google Gemini 3.1 Flash (Cloud), Meta Llama 3.2:1B (Sovereign Local).
-
-Backend: FastAPI (Python), Uvicorn, SQLite (WAL Mode).
-
-Forensics: Windows Sysmon, Npcap, VirusTotal API.
-
-Security: Deterministic Intent Governance, Zero-Trust API Authentication (HMAC-SHA256).
-
-⚖️ License
-Distributed under the MIT License. See LICENSE for more information.
-
-Author: Jacob Derwojed (KodenameRed)
