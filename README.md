@@ -1,10 +1,9 @@
-
 🛡️ **Aegis Overwatch**: Autonomous AI-Driven XDR  
 **The Zero-Trust, Dual-Hybrid Intelligence Framework**
 
-Aegis Overwatch is a bleeding-edge, autonomous Endpoint Detection and Response (EDR) framework. Unlike traditional signature-based tools, Aegis uses a hybrid mathematical + neural architecture to bridge raw kernel telemetry and high-level cognitive reasoning.
+Aegis Overwatch is a bleeding-edge, autonomous Endpoint Detection and Response (EDR) framework designed to solve the two greatest crises in modern cybersecurity: catastrophic SOC burnout and the unacceptable enterprise risk of unstructured AI access. 
 
-It decouples the **Nervous System** (local sensors + math engine) from the **Brain** (LLM-driven triage) and features a dynamic **Dual-Hybrid Routing System** — cloud-scale AI for speed and an air-gapped Sovereign core as absolute failsafe.
+Unlike traditional signature-based tools or vulnerable "AI wrappers," Aegis uses a hybrid mathematical and neural architecture to bridge raw kernel telemetry with high-level cognitive reasoning. It decouples the **Nervous System** (deterministic local sensors) from the **Brain** (LLM-driven triage), enforcing strict zero-trust parameters at every layer of execution.
 
 ---
 
@@ -60,13 +59,24 @@ flowchart LR
 
 ---
 
-### ⚡ Core Features
+### ⚡ Core Architectural Innovations
 
-- **Dual-Hybrid Neural Routing** — Cloud (Gemini) or Sovereign Local (Ollama) with automatic fallback
-- **Nexus Dossier Compilation** — Auto-correlates host + network anomalies into executive summaries
-- **Neural Specialist Pre-Scoring** — v35k ONNX model does sub-millisecond triage
-- **Deterministic Intent Governance** — Hardcoded safety layer prevents dangerous AI actions
-- **Network Jitter Analysis** — Detects robotic C2 beaconing via rhythm & volume baselines
+Aegis is built around several pioneering subsystems that force autonomous intelligence to operate within mathematically unbreakable bounds.
+
+#### 1. The Master Strategic Audit (The Crowning Achievement)
+Standard volumetric alerts completely miss "Low and Slow" Advanced Persistent Threats (APTs). The Aegis **Strategic DB Hunter** solves this with a one-click, unified 7-day historical audit. It leverages a 12-hour "Nexus Hindsight" aggregator to sweep isolated, low-volume events across multiple ports. By applying a custom **Jitter-Trap Uniformity Test**, it calculates the Coefficient of Variation (CV) to mathematically prove when seemingly "irregular background noise" is actually a perfectly synthetic, LLM-augmented C2 beacon. 
+
+#### 2. The Semantic Airlock & Cryptographic Privacy Gateway
+Before any telemetry is evaluated by an LLM, it must survive the Privacy Gateway. This is an absolute zero-trust boundary. It utilizes deterministic HMAC-SHA256 hashing to mask PII, enterprise secrets, and infrastructure (e.g., translating a private IP to `[LAN_IP_A7F9B2]`). This allows the AI to accurately track lateral movement over days without ever seeing raw data. Simultaneously, the **Semantic Airlock** preemptively destroys Base64 payloads and neutralizes embedded jailbreak attempts, fully immunizing the framework against prompt-poisoning.
+
+#### 3. Intent Governance & Kinetic Caging
+Giving autonomous agents unstructured access to the OS is a critical enterprise liability. Aegis physically severs reasoning from execution. When the Cloud Actuary proposes a remediation action (e.g., `KILL_PROCESS` or `ISOLATE_HOST`), the **Intent Governance Judge** evaluates it against a localized vault of protected OS primitives (like `lsass.exe` or `svchost.exe`). If the AI hallucinates or attempts an action that exceeds its autonomous bounds, the deterministic Python gatekeeper mathematically vetoes it, preventing AI-driven self-destruction.
+
+#### 4. Dual-Hybrid Cognitive Resilience
+Organizations no longer have to choose between the analytical power of the cloud and the privacy of local models. Aegis runs on a hot-swappable architecture. It reaches its peak potential synthesizing temporal kill-chains via the Cloud Actuary (Gemini 1.5 Flash). However, if an adversary severs external routing or an API outage occurs, Aegis executes an **Autonomous Cognitive Failover**. It seamlessly reroutes high-risk threat DNA to the air-gapped Sovereign Local Core (Llama 3.2 1B), keeping the endpoint securely fortified in a "degraded but defended" state.
+
+#### 5. IP Maturation & Dynamic Rule Sealing
+Aegis learns dynamically without degrading its security posture. If the Master Audit flags an obfuscated internal script that the SOC team verifies as benign, the system initiates a cryptographically secure "Mark Safe and Learn" protocol. The morphological DNA of that specific execution lineage is extracted and injected into the *Aegis Constitution* as a hardened failsafe. The database is instantly resealed with an HMAC-SHA256 signature to mathematically prevent adversaries from silently adding malware to the whitelist.
 
 ---
 
@@ -75,45 +85,43 @@ flowchart LR
 **Prerequisites**
 - Windows 10/11 (Admin rights required)
 - Python 3.10+
-- Npcap (for Network Sentinel)
-- Ollama (optional but recommended for Sovereign mode)
+- Npcap (for Native ETW/WFP Network Sifting)
+- Ollama 
 
-**One-Click Deploy**
+**One-Click Deploy (Admin Rights)**
 ```powershell
 .\Deploy-Aegis.bat
 ```
 
-This script:
-- Creates a clean virtual environment
-- Installs all dependencies (FastAPI, Jinja2, ONNX, etc.)
-- Sets up Ollama automatically if missing
-- Creates a desktop shortcut
-- Launches the C2 console
+This script handles the full lifecycle:
+- Creates a pristine virtual environment
+- Installs all dependencies (FastAPI, Jinja2, ONNX runtime, etc.)
+- Auto-provisions Ollama endpoints if missing
+- Creates the local desktop shortcut
+- Ignites the C2 terminal
 
-After deployment, open `Aegis-Switch.bat` (or the desktop shortcut) → the web dashboard will open at `http://localhost:8000/dashboard`.
+(Total Deployment Phase approx 8-12 minutes)
 
-**First-Time Setup**
-The UI will guide you through:
-1. Creating your cryptographic master key (AEGIS_API_KEY)
-2. Choosing Cloud (Gemini) or Sovereign (Ollama) mode
-3. (Optional) Adding VirusTotal API key
+After deployment,  `Aegis-Switch.bat` will automatically launch to access the War Terminal at `http://localhost:8000/dashboard`. Otherwise, the Aegis Shortcut will be set up on desktop for return use.
+
+**First-Time Ignition**
+The local UI will initialize the setup sequence:
+1. Generate your cryptographic master key (AEGIS_API_KEY) for local data attestation.
+2. Select your cognitive engine: Cloud (Gemini) or Sovereign (Ollama).
+3. (Optional) Integrate VirusTotal API credentials.
 
 ---
 
 ### 🛠️ Tech Stack
 
-- **Intelligence**: Gemini 1.5 Flash (Cloud) + Llama 3.2 1B (Sovereign via Ollama)
-- **Backend**: FastAPI + Uvicorn + SQLite (WAL)
-- **Forensics**: ONNX models, Npcap, Sysmon integration
-- **Security**: HMAC-SHA256 signing, Deterministic Intent Governance
+- **Intelligence**: Gemini 3.1 Flash (Cloud) + Llama 3.2 1B (Sovereign via Ollama)
+- **Mathematical Sifting**: SciPy, Numpy, Custom Morphological Entropy Algorithms
+- **Backend Orchestration**: FastAPI + Uvicorn + SQLite (WAL-optimized for compaction)
+- **Forensics & Triage**: ONNX Neural Networks, Npcap, Windows ETW/WFP
+- **Security Governance**: HMAC-SHA256 Crypto-Sealing, Deterministic Sandbox Routing
 
 ---
 
-**License**  
-MIT License — see [LICENSE](LICENSE) for details.
+**License** MIT License — see [LICENSE](LICENSE) for details.
 
 **Author**: Jacob Derwojed (KodenameRed)
-
----
-
-
