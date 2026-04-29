@@ -13,47 +13,57 @@ It decouples the **Nervous System** (local sensors + math engine) from the **Bra
 ```mermaid
 flowchart LR
     %% Styling
-    classDef base fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
-    classDef triage fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
-    classDef orchestrator fill:#eceff1,stroke:#607d8b,stroke-width:2px,color:#000
-    classDef socket fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000
-    classDef forensic fill:#e0f2f1,stroke:#00897b,stroke-width:2px,color:#000
+    classDef raw fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
+    classDef edge fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
+    classDef gateway fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000
+    classDef cloud fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000
+    classDef govern fill:#ffebee,stroke:#f44336,stroke-width:2px,color:#000
+    classDef terminal fill:#e0f2f1,stroke:#00897b,stroke-width:2px,color:#000
 
-    %% Core Nodes
-    BaseHive["<b>BASE HIVE</b><br/>(Continuous Ingestion)<br/><i>Lightweight, persistent ingestion.<br/>Minimal host impact.</i>"]:::base
-
-    Triage["<b>v35k ONNX SPECIALIST</b><br/>(Triage Nurse)<br/><i>Every event processed.<br/>'S' = simple risk score.</i>"]:::triage
-
-    Router["<b>ORCHESTRATOR & SPECIALIST ROUTER</b><br/><i>If S > 0.70 → routes to correct socket.</i>"]:::orchestrator
-
-    Forensic["<b>LIVE FORENSIC CONTEXTUALIZATION</b><br/><i>Deep context-aware analysis.</i>"]:::forensic
-
-    %% Specialist Sockets
-    subgraph Sockets ["SPECIALIST SOCKETS (JIT Provisioning)"]
+    subgraph Edge ["🔒 Phase 1: Sovereign Local Core (Nervous System)"]
         direction TB
-        C2["<b>C2 / NETWORK SCALPEL</b><br/><i>Beaconing & jitter analysis</i>"]:::socket
-        Ransomware["<b>RANSOMWARE SPECIALIST</b><br/><i>Filesystem volatility</i>"]:::socket
-        Lolbin["<b>LATERAL / LOLBIN SPECIALIST</b><br/><i>Script & CLI abuse</i>"]:::socket
-        Extensible["<b>EXTENSIBLE SOCKET</b><br/><i>Future agents</i>"]:::socket
+        Telemetry["<b>RAW OS TELEMETRY</b><br/><i>Native ETW & WFP Hooks</i>"]:::raw
+        Hunter["<b>STRATEGIC DB HUNTER</b><br/><i>Temporal Sweeps & Jitter-Trap Test</i>"]:::edge
+        ONNX["<b>DETERMINISTIC EDGE FILTERING</b><br/><i>v35k ONNX & Morphological Math</i>"]:::edge
     end
 
-    %% Flow
-    BaseHive -->|Kernel Telemetry| Triage
-    BaseHive -->|Registry Changes| Triage
-    BaseHive -->|Network Activity| Triage
+    subgraph Airlock ["🛡️ Phase 2: Zero-Trust Data Sanitization"]
+        direction TB
+        Crypto["<b>CRYPTOGRAPHIC GATEWAY</b><br/><i>HMAC-SHA256 PII & Host Masking</i>"]:::gateway
+        Semantic["<b>SEMANTIC AIRLOCK</b><br/><i>Neutralizes Prompt-Poisoning & Base64</i>"]:::gateway
+    end
 
-    Triage -->|Risk Score 'S'| Router
-    Triage -->|Feature Vector| Router
+    subgraph Actuary ["☁️ Phase 3: Strategic Cloud Actuary (Brain)"]
+        direction TB
+        Audit["<b>MASTER STRATEGIC AUDIT</b><br/><i>Aggregates 7-Day Nexus Dossier</i>"]:::cloud
+        LLM["<b>HOT-SWAPPABLE CLOUD LLM</b><br/><i>MITRE Mapping & Semantic Synthesis</i>"]:::cloud
+    end
 
-    Router -->|Activated| C2
-    Router -->|Activated| Ransomware
-    Router -->|Activated| Lolbin
-    Router -->|Activated| Extensible
+    subgraph Execution ["⚡ Phase 4: Intent Governance & Remediation"]
+        direction TB
+        Judge["<b>INTENT GOVERNANCE JUDGE</b><br/><i>Mathematical Veto vs OS Self-Destruction</i>"]:::govern
+        WarTerm["<b>WAR TERMINAL UI</b><br/><i>Pre-Staged Actions (Isolate, Dump, Suspend)</i>"]:::terminal
+        Learn["<b>CRYPTOGRAPHIC RULE SEALING</b><br/><i>'Mark Safe & Learn' Organic Maturation</i>"]:::terminal
+    end
 
-    C2 --> Forensic
-    Ransomware --> Forensic
-    Lolbin --> Forensic
-    Extensible --> Forensic
+    %% Flow Path
+    Telemetry --> Hunter
+    Telemetry --> ONNX
+    Hunter -->|Drops 95% benign noise| ONNX
+    
+    ONNX -->|Forwards Abstracted Threat DNA| Crypto
+    Hunter -.->|Triggers 12h Slow-and-Low Nexus| Audit
+    
+    Crypto --> Semantic
+    Semantic -->|Air-gapped Context Stream| LLM
+    Audit --> LLM
+    
+    LLM -->|Proposes SOAR Playbook| Judge
+    Judge -- "Intent Vetoed (Targeting svchost/lsass)" --> Judge
+    Judge -->|"Intent Mathematically Verified"| WarTerm
+    
+    WarTerm -.->|"Analyst Confirms Benign DevOps"| Learn
+    Learn -.->|"Injects Signed Rule to Failsafe"| ONNX
 ```
 
 ---
