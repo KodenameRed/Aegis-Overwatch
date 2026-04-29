@@ -23,7 +23,7 @@ flowchart LR
         direction TB
         Raw["<b>NATIVE TELEMETRY</b><br/><i>ETW & WFP Streams</i>"]:::edge
         Sifter["<b>MORPHOLOGICAL SIFTER & DB HUNTER</b><br/><i>Math & Jitter-Traps.<br/>Kills 95% of noise locally.</i>"]:::edge
-        ONNX["<b>v35k ONNX SPECIALIST</b><br/><i>Neural Scoring<br/>(Zero Token Cost)</i>"]:::edge
+        ONNX["<b>Machine Learned (v35k ONNX SPECIALIST)</b><br/><i>Neural Scoring<br/>(Zero Token Cost)</i>"]:::edge
         
         Raw --> Sifter --> ONNX
     end
