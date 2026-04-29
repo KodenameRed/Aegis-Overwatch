@@ -14,6 +14,7 @@ The Dual-Hybrid SOC Agent (The Specialist): An autonomous worker powered by Gemi
 
 The Network Sentinel (The Watchman): A compiled C2 Socket specialist that performs real-time rhythm and volumetric analysis on network traffic to identify stealthy, robotic beaconing or data exfiltration.
 
+```mermaid
 flowchart LR
     %% Styling Definitions
     classDef base fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
