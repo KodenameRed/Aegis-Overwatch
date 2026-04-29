@@ -12,55 +12,50 @@ It decouples the **Nervous System** (local sensors + math engine) from the **Bra
 
 ```mermaid
 flowchart LR
-    %% Styling
-    classDef edge fill:#e3f2fd,stroke:#1e88e5,stroke-width:2px,color:#000
-    classDef hunter fill:#fff3e0,stroke:#ff9800,stroke-width:2px,color:#000
-    classDef neural fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px,color:#000
-    classDef airlock fill:#fbe9e7,stroke:#ff5722,stroke-width:2px,color:#000
-    classDef cognitive fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px,color:#000
-    classDef execution fill:#e8f5e9,stroke:#4caf50,stroke-width:2px,color:#000
+    %% Bleeding-Edge Styling
+    classDef edge fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc
+    classDef boundary fill:#450a0a,stroke:#ef4444,stroke-width:2px,stroke-dasharray: 5 5,color:#f8fafc
+    classDef brain fill:#312e81,stroke:#8b5cf6,stroke-width:2px,color:#f8fafc
+    classDef cage fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#f8fafc
 
-    %% Edge Layer
-    subgraph Edge ["1. SOVEREIGN EDGE (Local Filtering)"]
+    %% Phase 1: Zero-Cost Edge Filtering
+    subgraph Edge ["1. SOVEREIGN EDGE (Deterministic Filtering)"]
         direction TB
-        Telemetry["<b>NATIVE TELEMETRY</b><br/><i>ETW & WFP Kernel Streams</i>"]:::edge
-        Sifter["<b>DETERMINISTIC SIFTER</b><br/><i>Morphological Math & Entropy</i><br/>Drops 95% of benign noise"]:::edge
-        Hunter["<b>STRATEGIC DB HUNTER</b><br/><i>Jitter-Traps & Nexus Sweeps</i><br/>Catches Low & Slow APTs"]:::hunter
-        Triage["<b>v35k ONNX SPECIALIST</b><br/><i>Neural Scoring & Lineage Checks</i><br/>S > 0.70 triggers orchestration"]:::neural
+        Raw["<b>NATIVE TELEMETRY</b><br/><i>ETW & WFP Streams</i>"]:::edge
+        Sifter["<b>MORPHOLOGICAL SIFTER & DB HUNTER</b><br/><i>Math & Jitter-Traps.<br/>Kills 95% of noise locally.</i>"]:::edge
+        ONNX["<b>v35k ONNX SPECIALIST</b><br/><i>Neural Scoring<br/>(Zero Token Cost)</i>"]:::edge
+        
+        Raw --> Sifter --> ONNX
     end
 
-    %% The Privacy Airlock
-    Gateway["<b>CRYPTOGRAPHIC PRIVACY GATEWAY</b><br/><i>HMAC-SHA256 Masking & Semantic Airlock</i><br/>Prevents Prompt Injection & PII Leaks"]:::airlock
-
-    %% Cognitive Layer
-    subgraph Brain ["2. DUAL-HYBRID SYNTHESIS"]
-        direction TB
-        Cloud["<b>STRATEGIC CLOUD ACTUARY</b><br/><i>Hot-Swappable Frontier LLM</i><br/>Temporal Correlation & Playbooks"]:::cognitive
-        Failover["<b>LOCAL SOVEREIGN CORE</b><br/><i>Air-Gapped LLM</i><br/>Cognitive Failover (Degraded but Defended)"]:::cognitive
+    %% Phase 2: The Absolute Security Boundary
+    subgraph Airlock ["2. ZERO-TRUST BOUNDARY"]
+        Gateway["<b>CRYPTOGRAPHIC PRIVACY GATEWAY</b><br/><i>HMAC-SHA256 PII Masking & Semantic Airlock.<br/>Immunizes against Prompt Poisoning.</i>"]:::boundary
     end
 
-    %% Execution & Governance
-    subgraph Terminal ["3. CLINICAL REMEDIATION"]
+    %% Phase 3: The Intelligence Engine
+    subgraph Cognitive ["3. DUAL-HYBRID SYNTHESIS"]
         direction TB
-        Gov["<b>INTENT GOVERNANCE JUDGE</b><br/><i>Deterministic Veto Gatekeeper</i><br/>Mathematically prevents AI Self-Destruction"]:::execution
-        War["<b>WAR TERMINAL UI</b><br/><i>Pre-Staged Kinetic Actions</i><br/>(Isolate Host, Memory Dump, Revoke TGT)"]:::execution
+        Cloud["<b>STRATEGIC CLOUD ACTUARY</b><br/><i>Frontier LLM (Primary)</i>"]:::brain
+        Local["<b>LOCAL SOVEREIGN CORE</b><br/><i>Air-Gapped LLM (Cognitive Failover)</i>"]:::brain
     end
 
-    %% Flow Routes
-    Telemetry -->|Execution & OS Logs| Sifter
-    Telemetry -->|Network DB| Hunter
-    Sifter -->|High Risk Feature Vector| Triage
-    Hunter -->|7-Day Aggregated Chain| Triage
-    
-    Triage -->|Validated Threat DNA| Gateway
-    
+    %% Phase 4: Mathematical Execution Control
+    subgraph Execution ["4. KINETIC CAGING"]
+        direction TB
+        Judge["<b>INTENT GOVERNANCE JUDGE</b><br/><i>Deterministic Veto Gatekeeper.<br/>Prevents AI-Driven Self-Destruction.</i>"]:::cage
+        Terminal["<b>WAR TERMINAL UI</b><br/><i>Clinical Remediation</i>"]:::cage
+        
+        Judge --> Terminal
+    end
+
+    %% Routing
+    ONNX -->|S > 0.70 Threat DNA| Gateway
     Gateway -->|Sanitized Context| Cloud
-    Gateway -.->|Network Outage / Isolation| Failover
-
-    Cloud -->|Proposes Action Playbook| Gov
-    Failover -->|Proposes Action Playbook| Gov
-
-    Gov -->|Intent Verified| War
+    Gateway -.->|Offline / API Outage| Local
+    
+    Cloud -->|Proposed Playbook| Judge
+    Local -->|Proposed Playbook| Judge
 ```
 
 ---
